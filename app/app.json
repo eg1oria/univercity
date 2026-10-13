@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "app",
+    "name": "Студенческий портал",
     "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,9 +28,16 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#1e5bc6",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Камера нужна, чтобы отметить посещаемость по QR-коду преподавателя.",
+          "recordAudioAndroid": false
         }
       ]
     ],
