@@ -1,56 +1,67 @@
-# Welcome to your Expo app 👋
+# Студенческий портал
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Мобильное приложение студента: расписание, отметка посещаемости по QR-коду, журнал оценок, транскрипт, калькулятор GPA, документы и чаты. Работает на iOS, Android и в браузере.
 
-## Get started
+Сейчас это прототип интерфейса: все данные — демонстрационные и лежат в [src/data/mock.ts](src/data/mock.ts). Входа в аккаунт и сервера пока нет.
 
-1. Install dependencies
+## Стек
 
-   ```bash
-   npm install
-   ```
+- [Expo](https://expo.dev) SDK 57, React Native 0.86, React 19
+- [Expo Router](https://docs.expo.dev/router/introduction) — маршруты по файлам в `src/app`
+- TypeScript, ESLint, Jest
 
-2. Start the app
+## Запуск
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Нужен Node.js 22 или новее.
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+```bash
+npx expo start
+```
 
-### Other setup steps
+Дальше откройте приложение в симуляторе iOS, эмуляторе Android, в Expo Go или в браузере — подсказки появятся в терминале. Сканер QR-кода требует камеру, поэтому в симуляторе доступен только ввод кода вручную.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Команды
 
-## Learn more
+| Команда | Что делает |
+| --- | --- |
+| `npm start` | Запускает dev-сервер |
+| `npm run ios` / `android` / `web` | Запускает dev-сервер и открывает приложение на платформе |
+| `npm run lint` | Проверяет код линтером |
+| `npm run typecheck` | Проверяет типы |
+| `npm test` | Запускает тесты |
 
-To learn more about developing your project with Expo, look at the following resources:
+Те же три проверки — линтер, типы, тесты — выполняет GitHub Actions на каждый push в `main` и на каждый pull request: [.github/workflows/ci.yml](../.github/workflows/ci.yml).
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Структура
 
-## Join the community
+```
+src/
+  app/            экраны и навигация
+    (tabs)/       вкладки: главная, расписание, QR, чаты, настройки
+    chat/[id]     переписка
+    +not-found    экран для несуществующего адреса
+  components/     общие компоненты, в ui/ — базовые: текст, кнопка, карточка
+  constants/      токены дизайн-системы: цвета, шрифты, отступы
+  data/           демонстрационные данные и расчёты (GPA, ближайшая пара)
+  hooks/          хуки
+  lib/            даты и склонение числительных
+assets/           иконки и заставка
+```
 
-Join our community of developers creating universal apps.
+Тесты лежат рядом с кодом в папках `__tests__`.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Демонстрационные данные
+
+Студент, вуз, расписание, оценки, документы и чаты задаются в одном файле — [src/data/mock.ts](src/data/mock.ts). Название вуза — поле `university.name`, сейчас там заглушка «Университет».
+
+## Чего пока нет
+
+- входа в аккаунт и работы с сервером;
+- сохранения данных между запусками: сообщения, заявки и настройки живут в памяти;
+- проверки QR-кода — сканер принимает любой код;
+- уведомлений, входа по биометрии, смены языка и тёмной темы;
+- отправки отчётов о сбоях и аналитики.

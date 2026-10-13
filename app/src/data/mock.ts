@@ -10,7 +10,6 @@ export const university = {
 };
 
 export const student = {
-  firstName: 'Айгерим',
   fullName: 'Айгерим Сейткали',
   id: '230104',
   group: 'ИС-23-1',

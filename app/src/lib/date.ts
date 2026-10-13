@@ -77,14 +77,6 @@ export function startOfStudyWeek(date: Date) {
   return monday;
 }
 
-export function greeting(date: Date) {
-  const hour = date.getHours();
-  if (hour >= 5 && hour < 12) return 'Доброе утро';
-  if (hour >= 12 && hour < 18) return 'Добрый день';
-  if (hour >= 18 && hour < 23) return 'Добрый вечер';
-  return 'Доброй ночи';
-}
-
 /** Duration after «через»: «10 минут», «1 час 5 минут». */
 export function formatDuration(totalMinutes: number) {
   const hours = Math.floor(totalMinutes / 60);
