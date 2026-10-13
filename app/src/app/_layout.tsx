@@ -4,15 +4,14 @@ import {
   GolosText_700Bold,
   useFonts,
 } from '@expo-google-fonts/golos-text';
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
+import { DefaultTheme, ThemeProvider } from 'expo-router';
 import { Stack } from 'expo-router/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { ChatProvider } from '@/components/chat-store';
-import { ThemePreferenceProvider } from '@/components/theme-preference';
-import { useScheme, useTheme } from '@/hooks/use-theme';
+import { useTheme } from '@/hooks/use-theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,25 +33,21 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemePreferenceProvider>
-      <ChatProvider>
-        <Navigation />
-      </ChatProvider>
-    </ThemePreferenceProvider>
+    <ChatProvider>
+      <Navigation />
+    </ChatProvider>
   );
 }
 
 function Navigation() {
-  const scheme = useScheme();
   const theme = useTheme();
-  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
 
   return (
     <ThemeProvider
       value={{
-        ...base,
+        ...DefaultTheme,
         colors: {
-          ...base.colors,
+          ...DefaultTheme.colors,
           primary: theme.brand,
           background: theme.surface,
           card: theme.surfaceRaised,
@@ -61,7 +56,7 @@ function Navigation() {
           notification: theme.danger,
         },
       }}>
-      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.surface } }} />
     </ThemeProvider>
   );

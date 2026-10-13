@@ -30,7 +30,7 @@ export default function GradesScreen() {
   const semesterGpa = gpa(semester.grades);
 
   return (
-    <Screen insideTabs={false} header={<Header title="Оценки" />}>
+    <Screen insideTabs={false} header={<Header title="Журнал" />}>
       <Card style={styles.summary}>
         <Text variant="caption" color="inkMuted">
           Средний балл за всё время
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.s4,
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: Radius.pill,
+    borderRadius: Radius.md,
   },
   subjects: {
     gap: Spacing.s3,

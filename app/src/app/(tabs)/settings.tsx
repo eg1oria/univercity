@@ -1,28 +1,22 @@
 import Constants from 'expo-constants';
+import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Alert, Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 
-import { useThemePreference, type ThemePreference } from '@/components/theme-preference';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, Divider } from '@/components/ui/card';
 import { Icon, type IconName } from '@/components/ui/icon';
+import { ProgressBar } from '@/components/ui/progress-bar';
 import { Screen, Section } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
-import { Radius, Spacing, type Theme } from '@/constants/theme';
-import { student, university } from '@/data/mock';
+import { Spacing, type Theme } from '@/constants/theme';
+import { allGrades, attendance, gpa, student, university } from '@/data/mock';
 import { useTheme } from '@/hooks/use-theme';
-
-const THEMES: { value: ThemePreference; label: string }[] = [
-  { value: 'system', label: 'Системная' },
-  { value: 'light', label: 'Светлая' },
-  { value: 'dark', label: 'Тёмная' },
-];
 
 const NOTIFICATIONS = [
   { key: 'lessons', title: 'Начало пары', caption: 'За 10 минут до занятия' },
   { key: 'grades', title: 'Новые оценки', caption: 'РК, экзамены, итоговые баллы' },
-  { key: 'deadlines', title: 'Дедлайны', caption: 'За день до срока сдачи' },
   { key: 'chats', title: 'Сообщения', caption: 'Чаты группы и преподавателей' },
 ] as const;
 
@@ -30,14 +24,14 @@ type NotificationKey = (typeof NOTIFICATIONS)[number]['key'];
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const { preference, setPreference } = useThemePreference();
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     lessons: true,
     grades: true,
-    deadlines: true,
     chats: false,
   });
   const [biometrics, setBiometrics] = useState(true);
+  const overallGpa = gpa(allGrades);
+  const attendanceRate = attendance.attended / attendance.total;
 
   const confirmLogout = () => {
     Alert.alert('Выйти из аккаунта?', 'Чтобы войти снова, понадобится логин и пароль.', [
@@ -63,6 +57,38 @@ export default function SettingsScreen() {
         </View>
       </Card>
 
+      <View style={styles.stats}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Журнал и GPA"
+          style={styles.stat}
+          onPress={() => router.push('/grades')}>
+          {({ pressed }) => (
+            <Card style={[styles.statCard, pressed && { backgroundColor: theme.surfaceSunken }]}>
+              <View style={styles.statHeader}>
+                <Text variant="caption" color="inkMuted">
+                  Средний балл
+                </Text>
+                <Icon name="chevronRight" size={16} color={theme.inkMuted} />
+              </View>
+              <Text variant="display">{overallGpa?.toFixed(2) ?? '—'}</Text>
+              <Text variant="caption" color="inkMuted">
+                GPA из 4.0
+              </Text>
+            </Card>
+          )}
+        </Pressable>
+        <Card style={[styles.stat, styles.statCard]}>
+          <Text variant="caption" color="inkMuted">
+            Посещаемость
+          </Text>
+          <Text variant="display">{Math.round(attendanceRate * 100)}%</Text>
+          <View style={styles.statBar}>
+            <ProgressBar value={attendanceRate} />
+          </View>
+        </Card>
+      </View>
+
       <Section title="Уведомления">
         <Card padded={false}>
           {NOTIFICATIONS.map((item, index) => (
@@ -80,31 +106,6 @@ export default function SettingsScreen() {
             </View>
           ))}
         </Card>
-      </Section>
-
-      <Section title="Оформление">
-        <View
-          accessibilityRole="radiogroup"
-          style={[styles.segments, { backgroundColor: theme.surfaceSunken }]}>
-          {THEMES.map((item) => {
-            const selected = item.value === preference;
-            return (
-              <Pressable
-                key={item.value}
-                accessibilityRole="radio"
-                accessibilityState={{ selected }}
-                onPress={() => setPreference(item.value)}
-                style={[
-                  styles.segment,
-                  selected && { backgroundColor: theme.surfaceRaised, borderColor: theme.border },
-                ]}>
-                <Text variant="bodyStrong" color={selected ? 'ink' : 'inkMuted'}>
-                  {item.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
       </Section>
 
       <Section title="Приложение">
@@ -206,6 +207,25 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
+  stats: {
+    flexDirection: 'row',
+    gap: Spacing.s3,
+  },
+  stat: {
+    flex: 1,
+  },
+  statCard: {
+    gap: Spacing.s1,
+  },
+  statHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  statBar: {
+    height: 18,
+    justifyContent: 'center',
+  },
   badges: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -222,21 +242,6 @@ const styles = StyleSheet.create({
   },
   rowBody: {
     flex: 1,
-  },
-  segments: {
-    flexDirection: 'row',
-    gap: Spacing.s1,
-    padding: Spacing.s1,
-    borderRadius: Radius.md,
-  },
-  segment: {
-    flex: 1,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    borderRadius: Radius.sm,
   },
   footer: {
     textAlign: 'center',

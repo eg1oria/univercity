@@ -1,160 +1,96 @@
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { lessonPlace, NowBadge } from '@/components/lesson-card';
-import { Avatar } from '@/components/ui/avatar';
-import { Status } from '@/components/ui/badge';
 import { Card, Divider } from '@/components/ui/card';
-import { Icon } from '@/components/ui/icon';
-import { ProgressBar } from '@/components/ui/progress-bar';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { Screen, Section } from '@/components/ui/screen';
 import { Text } from '@/components/ui/text';
-import { Spacing } from '@/constants/theme';
-import {
-  allGrades,
-  attendance,
-  currentOrNextLesson,
-  deadlines,
-  deadlineStatus,
-  gpa,
-  lessonsOn,
-  student,
-  university,
-  type Deadline,
-  type UpcomingLesson,
-} from '@/data/mock';
+import { Radius, Spacing } from '@/constants/theme';
+import { currentOrNextLesson, lessonsOn, type UpcomingLesson } from '@/data/mock';
 import { useNow } from '@/hooks/use-now';
 import { useTheme } from '@/hooks/use-theme';
 import {
   addDays,
   formatDay,
   formatDuration,
-  greeting,
   isSameDay,
   minutesOfDay,
   parseTime,
 } from '@/lib/date';
 
+const SHORTCUTS: { icon: IconName; label: string; href: Href }[] = [
+  { icon: 'document', label: 'Документы', href: '/documents' },
+  { icon: 'calendar', label: 'Расписание', href: '/schedule' },
+  { icon: 'transcript', label: 'Транскрипт', href: '/transcript' },
+  { icon: 'journal', label: 'Журнал', href: '/grades' },
+  { icon: 'calculator', label: 'Калькулятор GPA', href: '/gpa-calculator' },
+  { icon: 'qr', label: 'QR-сканер', href: '/qr' },
+  { icon: 'chat', label: 'Чаты', href: '/chats' },
+  { icon: 'settings', label: 'Настройки', href: '/settings' },
+];
+
 export default function HomeScreen() {
   const theme = useTheme();
   const now = useNow();
-  const minutes = minutesOfDay(now);
   const upcoming = currentOrNextLesson(now);
-  const today = lessonsOn(now);
-  const overallGpa = gpa(allGrades);
-  const attendanceRate = attendance.attended / attendance.total;
 
   return (
     <Screen>
-      <View style={styles.intro}>
-        <View style={styles.topRow}>
-          <Text variant="label" color="inkMuted" style={styles.uppercase}>
-            {university.name}
-          </Text>
+      <Text variant="title" style={styles.title}>
+        Главная
+      </Text>
+
+      <View style={styles.shortcuts}>
+        {SHORTCUTS.map((shortcut) => (
           <Pressable
+            key={shortcut.label}
             accessibilityRole="button"
-            accessibilityLabel="Профиль и настройки"
-            onPress={() => router.navigate('/settings')}>
-            <Avatar name={student.fullName} size={40} />
+            accessibilityLabel={shortcut.label}
+            onPress={() => router.navigate(shortcut.href)}
+            style={styles.shortcut}>
+            {({ pressed }) => (
+              <>
+                <View
+                  style={[
+                    styles.shortcutIcon,
+                    {
+                      backgroundColor: pressed ? theme.surfaceSunken : theme.surfaceRaised,
+                      borderColor: theme.border,
+                    },
+                  ]}>
+                  <Icon name={shortcut.icon} size={24} color={theme.brand} />
+                </View>
+                <Text variant="caption" numberOfLines={2} style={styles.shortcutLabel}>
+                  {shortcut.label}
+                </Text>
+              </>
+            )}
           </Pressable>
-        </View>
-        <Text variant="display">
-          {greeting(now)}, {student.firstName}
-        </Text>
-        <Text color="inkMuted">
-          {formatDay(now)} · {student.group}
-        </Text>
+        ))}
       </View>
 
       {upcoming ? <UpcomingCard upcoming={upcoming} now={now} /> : null}
 
-      <View style={styles.stats}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Оценки и GPA"
-          style={styles.stat}
-          onPress={() => router.push('/grades')}>
-          {({ pressed }) => (
-            <Card style={[styles.statCard, pressed && { backgroundColor: theme.surfaceSunken }]}>
-              <View style={styles.statHeader}>
-                <Text variant="caption" color="inkMuted">
-                  Средний балл
-                </Text>
-                <Icon name="chevronRight" size={16} color={theme.inkMuted} />
-              </View>
-              <Text variant="display">{overallGpa?.toFixed(2) ?? '—'}</Text>
-              <Text variant="caption" color="inkMuted">
-                GPA из 4.0
-              </Text>
-            </Card>
-          )}
-        </Pressable>
-        <Card style={[styles.stat, styles.statCard]}>
-          <Text variant="caption" color="inkMuted">
-            Посещаемость
-          </Text>
-          <Text variant="display">{Math.round(attendanceRate * 100)}%</Text>
-          <View style={styles.statBar}>
-            <ProgressBar value={attendanceRate} />
-          </View>
-        </Card>
-      </View>
-
       <Section
-        title="Сегодня"
+        title="Расписание"
         action={
           <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.navigate('/schedule')}>
             <Text variant="bodyStrong" color="brand">
-              Всё расписание
+              Вся неделя
             </Text>
           </Pressable>
         }>
-        <Card padded={false}>
-          {today.length === 0 ? (
-            <View style={styles.row}>
-              <Text color="inkMuted">Сегодня пар нет</Text>
-            </View>
-          ) : (
-            today.map((lesson, index) => {
-              const isPast = minutes >= parseTime(lesson.end);
-              return (
-                <View key={lesson.id}>
-                  {index > 0 ? <Divider /> : null}
-                  <View style={styles.row}>
-                    <Text variant="bodyStrong" color={isPast ? 'inkMuted' : 'ink'} style={styles.rowTime}>
-                      {lesson.start}
-                    </Text>
-                    <View style={styles.rowBody}>
-                      <Text color={isPast ? 'inkMuted' : 'ink'} numberOfLines={1}>
-                        {lesson.subject}
-                      </Text>
-                      <Text variant="caption" color="inkMuted">
-                        {lessonPlace(lesson)}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              );
-            })
-          )}
-        </Card>
-      </Section>
-
-      <Section title="Дедлайны">
-        <Card padded={false}>
-          {deadlines.map((deadline, index) => (
-            <View key={deadline.id}>
-              {index > 0 ? <Divider /> : null}
-              <DeadlineRow deadline={deadline} now={now} />
-            </View>
-          ))}
-        </Card>
+        <DayLessons title="Сегодня" date={now} now={now} />
+        <DayLessons title="Завтра" date={addDays(now, 1)} now={now} />
       </Section>
     </Screen>
   );
 }
 
+/** The lesson in progress or the nearest one: a single quiet row with the time on the left. */
 function UpcomingCard({ upcoming, now }: { upcoming: UpcomingLesson; now: Date }) {
+  const theme = useTheme();
   const { lesson, date, status } = upcoming;
   const minutes = minutesOfDay(now);
   const start = parseTime(lesson.start);
@@ -162,116 +98,156 @@ function UpcomingCard({ upcoming, now }: { upcoming: UpcomingLesson; now: Date }
 
   let when: string;
   if (status === 'now') {
-    when = `Закончится через ${formatDuration(end - minutes)}`;
+    when = `ещё ${formatDuration(end - minutes)}`;
   } else if (isSameDay(date, now)) {
-    when = `Начнётся через ${formatDuration(start - minutes)}`;
+    when = `через ${formatDuration(start - minutes)}`;
   } else if (isSameDay(date, addDays(now, 1))) {
-    when = `Завтра · ${lesson.start}`;
+    when = 'Завтра';
   } else {
-    when = `${formatDay(date)} · ${lesson.start}`;
+    when = formatDay(date);
   }
 
   return (
-    <Card tone="tint" style={styles.upcoming}>
-      {status === 'now' ? (
-        <NowBadge />
-      ) : (
-        <Text variant="label" color="brandTintInk" style={styles.uppercase}>
-          Следующая пара
-        </Text>
-      )}
-      <View>
-        <Text variant="title">{lesson.subject}</Text>
-        <Text>
-          {lessonPlace(lesson)} · {lesson.teacher}
-        </Text>
+    <Card padded={false}>
+      <View style={styles.upcoming}>
+        <View style={styles.upcomingHeader}>
+          {status === 'now' ? (
+            <NowBadge />
+          ) : (
+            <Text variant="label" color="inkMuted" style={styles.uppercase}>
+              Следующая пара
+            </Text>
+          )}
+          <Text variant="caption" color="inkMuted">
+            {when}
+          </Text>
+        </View>
+        <View style={styles.upcomingLesson}>
+          <View style={styles.rowTime}>
+            <Text variant="bodyStrong">{lesson.start}</Text>
+            <Text variant="caption" color="inkMuted">
+              {lesson.end}
+            </Text>
+          </View>
+          <View style={styles.rowBody}>
+            <Text variant="heading">{lesson.subject}</Text>
+            <Text variant="caption" color="inkMuted">
+              {lessonPlace(lesson)} · {lesson.teacher}
+            </Text>
+          </View>
+        </View>
       </View>
       {status === 'now' ? (
-        <ProgressBar value={(minutes - start) / (end - start)} track="surfaceRaised" />
+        // A hairline of progress along the bottom edge of the card.
+        <View style={[styles.upcomingTrack, { backgroundColor: theme.surfaceSunken }]}>
+          <View
+            style={[
+              styles.upcomingProgress,
+              { width: `${((minutes - start) / (end - start)) * 100}%`, backgroundColor: theme.sky },
+            ]}
+          />
+        </View>
       ) : null}
-      <View style={styles.upcomingFooter}>
-        <Text variant="bodyStrong" color="brandTintInk">
-          {lesson.start}–{lesson.end}
-        </Text>
-        <Text variant="caption" color="brandTintInk">
-          {when}
-        </Text>
-      </View>
     </Card>
   );
 }
 
-function dueLabel(deadline: Deadline, now: Date) {
-  if (deadline.dueInDays === 0) return `Сегодня · ${deadline.dueTime}`;
-  if (deadline.dueInDays === 1) return `Завтра · ${deadline.dueTime}`;
-  return `${formatDay(addDays(now, deadline.dueInDays))} · ${deadline.dueTime}`;
-}
-
-function DeadlineRow({ deadline, now }: { deadline: Deadline; now: Date }) {
-  const status = deadlineStatus(deadline);
+/** One day of the schedule; lessons that are already over are muted. */
+function DayLessons({ title, date, now }: { title: string; date: Date; now: Date }) {
+  const lessons = lessonsOn(date);
+  const minutes = isSameDay(date, now) ? minutesOfDay(now) : -1;
 
   return (
-    <View style={styles.row}>
-      <View style={styles.rowBody}>
-        <Text variant="bodyStrong" numberOfLines={1}>
-          {deadline.title}
-        </Text>
-        <Text variant="caption" color="inkMuted" numberOfLines={1}>
-          {deadline.subject}
-        </Text>
-      </View>
-      <View style={styles.deadlineMeta}>
-        {status === 'done' ? <Status tone="success">Сдано</Status> : null}
-        {status === 'overdue' ? <Status tone="danger">Просрочено</Status> : null}
-        {status === 'soon' ? <Status tone="warning">Дедлайн скоро</Status> : null}
-        <Text variant="caption" color="inkMuted">
-          {dueLabel(deadline, now)}
-        </Text>
-      </View>
+    <View style={styles.day}>
+      <Text variant="label" color="inkMuted" style={styles.uppercase}>
+        {title} · {formatDay(date)}
+      </Text>
+      <Card padded={false}>
+        {lessons.length === 0 ? (
+          <View style={styles.row}>
+            <Text color="inkMuted">Пар нет</Text>
+          </View>
+        ) : (
+          lessons.map((lesson, index) => {
+            const isPast = minutes >= parseTime(lesson.end);
+            return (
+              <View key={lesson.id}>
+                {index > 0 ? <Divider /> : null}
+                <View style={styles.row}>
+                  <Text variant="bodyStrong" color={isPast ? 'inkMuted' : 'ink'} style={styles.rowTime}>
+                    {lesson.start}
+                  </Text>
+                  <View style={styles.rowBody}>
+                    <Text color={isPast ? 'inkMuted' : 'ink'} numberOfLines={1}>
+                      {lesson.subject}
+                    </Text>
+                    <Text variant="caption" color="inkMuted">
+                      {lessonPlace(lesson)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            );
+          })
+        )}
+      </Card>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  intro: {
-    gap: Spacing.s1,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.s2,
+  title: {
+    textAlign: 'center',
   },
   uppercase: {
     textTransform: 'uppercase',
   },
+  shortcuts: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: Spacing.s4,
+  },
+  shortcut: {
+    // Four in a row; the fifth and later wrap to the next line.
+    width: '25%',
+    alignItems: 'center',
+    gap: 6,
+  },
+  shortcutIcon: {
+    width: 56,
+    height: 56,
+    borderWidth: 1,
+    borderRadius: Radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shortcutLabel: {
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: 'center',
+  },
   upcoming: {
+    padding: Spacing.s4,
     gap: Spacing.s3,
   },
-  upcomingFooter: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: Spacing.s2,
-  },
-  stats: {
-    flexDirection: 'row',
-    gap: Spacing.s3,
-  },
-  stat: {
-    flex: 1,
-  },
-  statCard: {
-    gap: Spacing.s1,
-  },
-  statHeader: {
+  upcomingHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: Spacing.s2,
   },
-  statBar: {
-    height: 18,
-    justifyContent: 'center',
+  upcomingLesson: {
+    flexDirection: 'row',
+    gap: Spacing.s3,
+  },
+  upcomingTrack: {
+    height: 3,
+  },
+  upcomingProgress: {
+    height: '100%',
+  },
+  day: {
+    gap: Spacing.s2,
   },
   row: {
     flexDirection: 'row',
@@ -285,9 +261,5 @@ const styles = StyleSheet.create({
   },
   rowBody: {
     flex: 1,
-  },
-  deadlineMeta: {
-    alignItems: 'flex-end',
-    gap: 2,
   },
 });

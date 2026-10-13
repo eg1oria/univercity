@@ -19,9 +19,9 @@ import { formatDateTime } from '@/lib/date';
 
 const CODE_LENGTH = 6;
 const FRAME_SIZE = 248;
-// The viewfinder sits on a live camera image, so it uses the dark palette in both themes.
-const overlay = Colors.dark;
-const SCRIM = 'rgba(13, 19, 32, 0.72)';
+// The viewfinder sits on a live camera image: light marks on a dark scrim of `ink`.
+const overlay = { ink: Colors.onBrand, backdrop: Colors.ink };
+const SCRIM = 'rgba(15, 26, 46, 0.72)';
 
 type Attendance = {
   lesson: Lesson;
@@ -126,7 +126,7 @@ function Scanner({ active, onScanned, onManual, onError }: ScannerProps) {
   const [torch, setTorch] = useState(false);
 
   return (
-    <View style={[styles.root, { backgroundColor: overlay.surfaceSunken }]}>
+    <View style={[styles.root, { backgroundColor: overlay.backdrop }]}>
       {active ? (
         <CameraView
           style={StyleSheet.absoluteFill}
@@ -168,7 +168,7 @@ function Scanner({ active, onScanned, onManual, onError }: ScannerProps) {
           <Icon
             name={torch ? 'torchOn' : 'torchOff'}
             size={22}
-            color={torch ? overlay.surface : overlay.ink}
+            color={torch ? overlay.backdrop : overlay.ink}
           />
         </Pressable>
         <Pressable accessibilityRole="button" onPress={onManual} style={styles.control}>
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     backgroundColor: SCRIM,
-    borderRadius: Radius.pill,
+    borderRadius: Radius.md,
     paddingHorizontal: Spacing.s3,
     paddingVertical: 6,
   },
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     gap: Spacing.s2,
     height: 48,
     paddingHorizontal: Spacing.s4,
-    borderRadius: Radius.pill,
+    borderRadius: Radius.md,
     backgroundColor: SCRIM,
   },
   torch: {

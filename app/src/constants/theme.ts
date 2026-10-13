@@ -1,6 +1,6 @@
 /**
- * Tokens of the «Студенческий портал» design system: one accent colour (`brand`),
- * neutral surfaces separated by thin borders, Golos Text, a 4px grid.
+ * Tokens of the «Студенческий портал» design system, light theme only: one accent
+ * colour (`brand`), neutral surfaces separated by thin borders, Golos Text, a 4px grid.
  */
 
 import '@/global.css';
@@ -8,46 +8,25 @@ import '@/global.css';
 import type { TextStyle } from 'react-native';
 
 export const Colors = {
-  light: {
-    brand: '#1e5bc6',
-    brandHover: '#174a9f',
-    onBrand: '#ffffff',
-    sky: '#3aa9ec',
-    brandTint: '#e8f1fd',
-    brandTintInk: '#174a9f',
-    surface: '#f5f7fb',
-    surfaceRaised: '#ffffff',
-    surfaceSunken: '#eaeff6',
-    border: '#d6deea',
-    borderStrong: '#7d8aa1',
-    ink: '#0f1a2e',
-    inkMuted: '#566379',
-    success: '#18794e',
-    warning: '#a15c00',
-    danger: '#c2323a',
-  },
-  dark: {
-    brand: '#5c9cf2',
-    brandHover: '#82b5f6',
-    onBrand: '#0a1222',
-    sky: '#5cc2f7',
-    brandTint: '#16294a',
-    brandTintInk: '#a9cbfa',
-    surface: '#0d1320',
-    surfaceRaised: '#151d2c',
-    surfaceSunken: '#0a0f19',
-    border: '#2a3650',
-    borderStrong: '#5d6d8c',
-    ink: '#e9eef7',
-    inkMuted: '#9aa8bf',
-    success: '#4cc38a',
-    warning: '#f0b64e',
-    danger: '#f27b7b',
-  },
+  brand: '#1e5bc6',
+  brandHover: '#174a9f',
+  onBrand: '#ffffff',
+  sky: '#3aa9ec',
+  brandTint: '#e8f1fd',
+  brandTintInk: '#174a9f',
+  surface: '#f5f7fb',
+  surfaceRaised: '#ffffff',
+  surfaceSunken: '#eaeff6',
+  border: '#d6deea',
+  borderStrong: '#7d8aa1',
+  ink: '#0f1a2e',
+  inkMuted: '#566379',
+  success: '#18794e',
+  warning: '#a15c00',
+  danger: '#c2323a',
 } as const;
 
-export type Scheme = keyof typeof Colors;
-export type ThemeColor = keyof typeof Colors.light;
+export type ThemeColor = keyof typeof Colors;
 export type Theme = Record<ThemeColor, string>;
 
 /** Golos Text ships one file per weight, so the weight lives in the family name. */
@@ -78,10 +57,11 @@ export const Spacing = {
   s8: 32,
 } as const;
 
+/** One step sharper than the design system (6 / 10 / 16). `pill` is for circles and thin bars only. */
 export const Radius = {
-  sm: 6,
-  md: 10,
-  lg: 16,
+  sm: 4,
+  md: 8,
+  lg: 12,
   pill: 999,
 } as const;
 

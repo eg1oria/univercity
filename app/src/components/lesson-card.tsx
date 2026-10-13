@@ -1,8 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
-import { Radius, Spacing } from '@/constants/theme';
+import { Radius } from '@/constants/theme';
 import type { Lesson } from '@/data/mock';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -25,48 +24,7 @@ export function NowBadge() {
   );
 }
 
-export function LessonCard({ lesson, isNow = false }: { lesson: Lesson; isNow?: boolean }) {
-  const theme = useTheme();
-
-  return (
-    <Card tone={isNow ? 'tint' : 'raised'} style={styles.card}>
-      <View style={styles.time}>
-        <Text variant="bodyStrong">{lesson.start}</Text>
-        <Text variant="caption" color="inkMuted">
-          {lesson.end}
-        </Text>
-      </View>
-      <View
-        style={[styles.rule, { backgroundColor: isNow ? theme.sky : theme.border }]}
-      />
-      <View style={styles.body}>
-        {isNow ? <NowBadge /> : null}
-        <Text variant="heading">{lesson.subject}</Text>
-        <Text color="inkMuted">{lessonPlace(lesson)}</Text>
-        <Text variant="caption" color="inkMuted">
-          {lesson.teacher}
-        </Text>
-      </View>
-    </Card>
-  );
-}
-
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    gap: Spacing.s3,
-  },
-  time: {
-    width: 44,
-  },
-  rule: {
-    width: 2,
-    borderRadius: Radius.pill,
-  },
-  body: {
-    flex: 1,
-    gap: 2,
-  },
   now: {
     flexDirection: 'row',
     alignItems: 'center',

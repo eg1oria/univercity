@@ -20,6 +20,12 @@ export const student = {
 
 // ── Schedule ────────────────────────────────────────────────────────────────
 
+/** The autumn semester: 15 study weeks, the first one starts on Monday, 31 August 2026. */
+export const semester = {
+  start: new Date(2026, 7, 31),
+  weeks: 15,
+};
+
 export type LessonType = 'Лекция' | 'Практика' | 'Лабораторная';
 
 export type Lesson = {
@@ -224,33 +230,23 @@ export const attendance = {
   total: 90,
 };
 
-// ── Deadlines ───────────────────────────────────────────────────────────────
+// ── Documents ───────────────────────────────────────────────────────────────
 
-export type Deadline = {
+export type StudentDocument = {
   id: string;
   title: string;
-  subject: string;
-  /** Days from today, so the list stays relevant on any demo date. */
-  dueInDays: number;
-  dueTime: string;
-  done?: boolean;
+  /** Where the document is needed or what it covers. */
+  note: string;
+  date: string;
+  status: 'ready' | 'pending';
 };
 
-export const deadlines: Deadline[] = [
-  { id: 'd1', title: 'Лабораторная работа 4', subject: 'Базы данных', dueInDays: -1, dueTime: '23:59' },
-  { id: 'd2', title: 'СРО 3. Сортировки', subject: 'Алгоритмы и структуры данных', dueInDays: 1, dueTime: '23:59' },
-  { id: 'd3', title: 'Эссе по Канту', subject: 'Философия', dueInDays: 5, dueTime: '18:00' },
-  { id: 'd4', title: 'Вёрстка лендинга', subject: 'Веб-технологии', dueInDays: -3, dueTime: '23:59', done: true },
+export const initialDocuments: StudentDocument[] = [
+  { id: 'doc1', title: 'Справка с места учёбы', note: 'По месту требования', date: '12 окт', status: 'ready' },
+  { id: 'doc2', title: 'Транскрипт', note: '1–2 семестры', date: '2 окт', status: 'ready' },
+  { id: 'doc3', title: 'Заявление на академическую мобильность', note: 'Весенний семестр', date: '9 окт', status: 'pending' },
+  { id: 'doc4', title: 'Договор об оказании образовательных услуг', note: '2023–2027', date: '1 сен', status: 'ready' },
 ];
-
-export type DeadlineStatus = 'done' | 'overdue' | 'soon' | 'planned';
-
-export function deadlineStatus(deadline: Deadline): DeadlineStatus {
-  if (deadline.done) return 'done';
-  if (deadline.dueInDays < 0) return 'overdue';
-  if (deadline.dueInDays <= 2) return 'soon';
-  return 'planned';
-}
 
 // ── Chats ───────────────────────────────────────────────────────────────────
 

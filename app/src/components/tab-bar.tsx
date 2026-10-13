@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   iconPill: {
     width: 52,
     height: 28,
-    borderRadius: Radius.pill,
+    borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
   },

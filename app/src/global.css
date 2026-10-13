@@ -2,10 +2,3 @@ html,
 body {
   background-color: #f5f7fb;
 }
-
-@media (prefers-color-scheme: dark) {
-  html,
-  body {
-    background-color: #0d1320;
-  }
-}
